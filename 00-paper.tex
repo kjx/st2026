@@ -1,0 +1,202 @@
+% -*- coding: utf-8; -*-
+% vim: set fileencoding=utf-8 :
+\documentclass[english,submission]{programming}
+%% First parameter: the language is 'english'.
+%% Second parameter: use 'submission' for initial submission, remove it for camera-ready (see 5.1)
+
+\usepackage[backend=biber]{biblatex}
+\addbibresource{example.bib}
+
+
+%
+% Packages and Commands specific to article (see 3)
+%
+% These ones  are used in the guide, replace with your own.
+% 
+%% \usepackage{multicol}
+%% \usepackage{ccicons}
+%% \lstdefinelanguage[programming]{TeX}[AlLaTeX]{TeX}{%
+%%   deletetexcs={title,author,bibliography},%
+%%   deletekeywords={tabular},
+%%   morekeywords={abstract},%
+%%   moretexcs={chapter},%
+%%   moretexcs=[2]{title,author,subtitle,keywords,maketitle,titlerunning,authorinfo,affiliation,authorrunning,paperdetails,acks,email},
+%%   moretexcs=[3]{addbibresource,printbibliography,bibliography},%
+%% }%
+%% \lstset{%
+%%   language={[programming]TeX},%
+%%   keywordstyle=\firamedium,
+%%   stringstyle=\color{RosyBrown},%
+%%   texcsstyle=*{\color{Purple}\mdseries},%
+%%   texcsstyle=*[2]{\color{Blue1}},%
+%%   texcsstyle=*[3]{\color{ForestGreen}},%
+%%   commentstyle={\color{FireBrick}},%
+%%   escapechar=`,}
+%% \newcommand*{\CTAN}[1]{\href{http://ctan.org/tex-archive/#1}{\nolinkurl{CTAN:#1}}}
+%%
+
+
+%%%%%%%%%%%%%%%%%%
+%% These data MUST be filled for your submission. (see 5.3)
+\paperdetails{
+  %% perspective options are: art, sciencetheoretical, scienceempirical, engineering.
+  %% Choose exactly the one that best describes this work. (see 2.1)
+  perspective=art,
+  %% State one or more areas, separated by a comma. (see 2.2)
+  %% Please see list of areas in http://programming-journal.org/cfp/
+  %% The list is open-ended, so use other areas if yours is/are not listed.
+  area={Smalltalk},
+  %% You may choose the license for your paper (see 3.)
+  %% License options include: cc-by (default), cc-by-nc
+  % license=cc-by,
+}
+%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%
+%% These data are provided by the editors. May be left out on submission.
+%\paperdetails{
+%  submitted=2016-08-10,
+%  published=2016-10-11,
+%  year=2016,
+%  volume=1,
+%  issue=1,
+%  articlenumber=1,
+%}
+%%%%%%%%%%%%%%%%%%
+
+
+\begin{document}
+
+\title{The First Fifty Years of Smalltalk}
+\subtitle{Smalltalk-76 as the ur-Object-Oriented Programming Model}% optional
+\titlerunning{Fifty Years of Smalltalk-76} %optional, in case that the title is too long; the running title should fit into the top page column
+
+\author[a]{James Noble}[0000-0001-9036-5692]
+\authorinfo{Visiting International Chair. 
+  \email{james.noble@programming.ac.nz}.}
+\affiliation[a]{INRIA Lille, France}
+
+\author{Your Name Here}[0000-0000-0000-0000]
+\authorinfo{Visiting International Chair. 
+  \email{your.name.jere@inria.fr}.}
+\affiliation{INRIA Lille, France}
+
+
+%% \author{Cristina V. Lopes}[orcid.org/0000-0003-0551-3908]
+%% \authorinfo{is associate editor for the first two issues of The Art, Science,
+%%   and Engineering of Programming. Contact her at \email{lopes@ics.uci.edu}.}
+%% \affiliation{University of California, Irvine, USA}
+%% \author[a]{Robert Hirschfeld}[https://orcid.org/0000-0002-4249-6003]
+%% \authorinfo{is chair of the AOSA steering committee. The Art, Science,
+%%   and Engineering of Programming is published by AOSA. Contact Robert at \email{hirschfeld@hpi.uni-potsdam.de}.}
+
+\authorrunning{J. Noble et al.}
+
+\keywords{Smalltalk, language, design, bytecodes, meta-model.} % please provide 1--5 keywords
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Please go to https://dl.acm.org/ccs/ccs.cfm and generate your Classification
+% System [view CCS TeX Code] stanz and copy _all of it_ to this place.
+%% From HERE
+\begin{CCSXML}
+<ccs2012>
+   <concept>
+       <concept_id>10011007.10011006.10011008.10011009.10011011</concept_id>
+       <concept_desc>Software and its engineering~Object oriented languages</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10011006.10011008.10011024.10011029</concept_id>
+       <concept_desc>Software and its engineering~Classes and objects</concept_desc>
+       <concept_significance>500</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10011007.10011006.10011041.10010943</concept_id>
+       <concept_desc>Software and its engineering~Interpreters</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+   <concept>
+       <concept_id>10003456.10003457.10003521.10003525</concept_id>
+       <concept_desc>Social and professional topics~History of programming languages</concept_desc>
+       <concept_significance>300</concept_significance>
+       </concept>
+ </ccs2012>
+\end{CCSXML}
+\ccsdesc[500]{Software and its engineering~Object oriented languages}
+\ccsdesc[500]{Software and its engineering~Classes and objects}
+\ccsdesc[300]{Software and its engineering~Interpreters}
+\ccsdesc[300]{Social and professional topics~History of programming languages}
+% To HERE
+%%%%%%%%%%%%%%%%%%%%%%%
+
+\maketitle
+
+% Please always include the abstract.
+% The abstract MUST be written according to the directives stated in 
+% http://programming-journal.org/submission/
+% Failure to adhere to the abstract directives may result in the paper
+% being returned to the authors.
+\begin{abstract}
+
+\begin{itemize}
+\item \textbf{Context:} This work addresses the design and
+  architecture of single-dispatch, garbage collected, object-oriented
+  programming languages such as Smalltalk, Python, Javascript, Ruby,
+  and Lua. A large fraction of contemporary software development is
+  carried out in these languages.
+
+\item \textbf{Inquiry:} This work combines an historical overview of
+  the development and evolution of these languages, highlighting
+  commonalities and differences in the problems they face, their
+  solutions to those problems, and how those solutions are grounded in
+  their architectures.
+  
+\item \textbf{Approach:} This work adopts a qualitative close reading
+  methodology, following the theory of paradigms of Thomas Kuhn, and
+  Lyotard's theory of ``small narratives'' from the Report on Knowledge.
+  No AI was harmed in the writing of this article.
+
+\item essay \textbf{Knowledge:} This does not ``uncover'' any new
+  facts, but rather it brings to light commonalities and narratives
+  that are not generally understood in either the research or
+  practitioner communities.
+  
+  
+\item \textbf{Grounding:} This work is grounded by a close reading of
+  of the descriptions and implementations of Smalltalk-76, its
+  successors and its heirs. 
+
+\item \textbf{Importance:} This work matters because it explains why
+  development practices and research results can be portable across
+  a number of object-oriented language. Programmers can use this
+  commonality to determine when techniques developed in one language
+  can be imported into another; while researchers can use this work to
+  argue why results about one of these languages are likely to be more
+  applicable than may originally appear. 
+
+\end{itemize}
+
+  
+\end{abstract} 
+
+
+\input{05-introduction.tex}
+\input{10-st76.tex}
+\input{20-st80.tex}
+\input{30-ruby.tex}
+\input{40-python.tex}
+\input{50-java.tex}  
+\input{60-self.tex}  
+\input{70-lua.tex}  
+\input{80-javascript.tex}  
+\input{90-conclusion.tex}  
+
+\acks
+This work is supported in part by the Royal Society of New Zealand Te
+Ap\={a}rangi  Marsden Fund Te P\={u}tea Rangahau a Marsden grants
+VUWU1815 and CRP2101, an Amazon Research Award, and an INRIA
+International Visiting Chair.
+
+
+\end{document}
