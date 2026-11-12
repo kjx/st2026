@@ -248,44 +248,49 @@ does not change the any of the design decisions underlying
 Smalltalk-76: everything is an object; all objects are instances of a
 class; message sending semantcs remain the Smalltalk-76 \verb+=> ->*+
 rule of always going from an instance to its class, and then searching
-up the class hierarchy as necessary. 
+up the class hierarchy as necessary.  Accoording to Dan Ingalls, when
+he put in metaclassses, he was \textit{``delighted to find that I
+  could do so with no change to the virtual machine.''}
+\cite{ingalls-hopl2020}.
 
 
-\subsection{Smalltalk-80 bytecodes}. 
 
 
-Other than this change --- which again is strictly on the Smalltalk
-side, not the interpreter / virtual machine -- -there were few other
-changes\ldots
 
-In that sense, Smalltalk-80 runs on a Smalltalk-76 virtual machine.
 
-But it's not the only one. 
+
+\subsection{Smalltalk-80 bytecodes}
+
+Also according to Dan Ingalls \textit{``Smalltalk-80 is not far
+  linguistically from Smalltalk-76, and its virtual machine
+  architecture is nearly identical''} \cite{ingalls-hopl2020}.
+Figure ~\ref{st80-bytecode-table} shows the bytecodes of a relatively
+contemporary Smalltalk system (Pharo, circa mid 2010s,
+\cite{bera-iwst-2014}.  Compared with the orignal Smalltalk-76
+bytecode interpreter shown in Figure~\ref{st-76-step}, the main
+difference is that it defines all 256 bytecodes. The structure of
+bytecodes grouped into 16 groups of 16, defined by a 4-bit
+``syllable'' remains the same; the first three groups, corresponding
+to the first three rows in the table, are identical; the fourth row
+extends the third ``load from literals'' aka ``push literal constant''
+group to handle 32 literals rather than 16; the fifth and six rows
+likewise extend the fourth ``load indirectly from literals'' aka
+``push literal variable'' group to handle 32 distinct literals, and
+the rest of the table is similarly expanded. 
+
+In that sense, Smalltalk-80 runs on what is essentially a Smalltalk-76
+virtual machine.
+
 
 
 
 \begin{figure}[htb]
 \begin{center}
- 
-  ~
-
-  ~
-
-  ~
-
-  ~   TO BE DRAWN
-
-  ~
-
-  ~  or hopefuly there is a table I can steal
-
-  ~
-
-  ~
-  
+\includegraphics[width=0.7\textwidth]{pictures/st80-bytecode-table.pdf}
 \end{center}
-\caption{Smalltalk-80 Bytecodes}
-\label{st80-bytecodes}
+\caption{Smalltalk-80 Bytecodes. From B{\'e}ra and Miranda
+  \cite{bera-iwst-2014}.  Used with permission.}
+\label{st80-bytecode-table}
 \end{figure}
 
 
