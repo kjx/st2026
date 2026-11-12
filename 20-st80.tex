@@ -1,21 +1,292 @@
 \section{Smalltalk-80}
 
+In the Hebrand universe of purely self-referential values, there is no
+notion of time. Three is always three: and if a FORTRAN program is
+able to assign four to three and thus redefine a global constant,
+well, that these days that would be a compiler bug. From the big bang
+(the priomordial fork) to the heat death of the universe as the
+laptop's battery runs out, nothing is created; nothing is destroyed;
+and strictly speaking, nothing happens.
 
-and Sequeak and Pharo and and and
+Object-oriented programs lack that luxury. In object-oriented
+programs, objects must be created, and eventually recycled or the
+program will exhaust physical memory. Likewise as a physical model of
+a part of the world, objects in the real world can be created and
+destroyed, or move into and out of the program's purview. This means
+that object-oriented languages must provide mechanisms to create new
+objects (and eventually to destroy them).  
+
+Dan Ingalls in \textit{Design Principles Behind Smalltalk}
+\cite{ingalls-byte1981} lists ``storage management'' one of his
+principles, saying ``\textit{To be truly "object-oriented" a computer
+  system must provide automatic storage managemen}''. Most of this
+discussion is taken to refer to the end of an object's lifecycle when
+it is garbage-collected --- or rather when least the space it has
+taken up may be reuse \cite{gc-book-perhpas}. How objects are created
+is at least as important, but has not be subject to the same focussed
+intention.
+
+\subsection{Creating objects in Smalltalk-78}
+
+In Smalltalks, objects are created by sending messages to objects,
+just as any other computations\footnote{The other major options are
+Simula's executing an obejct as it if were a procedure, then reifying
+the stack frame \cite{simiula-beta}; C$++$'s specially identified
+\textit{constructor} methods \cite{c++design-and-evolution}; Emerald's
+lexically scoped object constructor expressions \cite{emerald}; and
+Self's globally scoped object literals \cite{selfPower}.} In Smalltalk
+particular objects are created by sending a message requesting a class
+to return a new instance of itself. 
+In Smalltalk-76, for example, we can create a rectangle by asking the
+user to sweep out space on the screen by sending the
+``\textsf{fromuser}'' message to the ``\textsf{Rectangle}'' class,
+as shown in Fig.~\ref{st-76-fromuser}.
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{pictures/rectangle-fromuser.pdf}
+\end{center}
+\caption{Smalltalk-76 \textsf{fromuser} message, as sent to class
+  \textsf{Rectangle} and returning a rectangle. (This version from
+  Dan Ingall's reanimation of Smalltalk-78 on Javascript: Smalltalk-78
+  is essentially Smalltalk-76 running on a luggable with three 8086
+  CPUs instead of one Dorado.}
+\label{rectangle-fromuser}
+\end{figure} 
+
+
+This works because classes are objects, and so subject to Smalltalk's
+``\verb+=> ->*+'' execution rule; lookup always goes once from an
+object to its class; and then any number of times from that class to
+its superclasses. The object representing the class \textsf{Rectangle}
+is an instance of the class \textsf{Class}, as shown in
+Fig.~\ref{st76-rectangle-class}, and so the \textsf{fromuser} message
+sent to \textsf{Rectangle} resolves to a method in class
+\textsf{Class}'s method dictionary.
+
+\begin{figure}[htb]
+\begin{center}
+ 
+~
+
+  ~
+
+  ~
+
+  ~   TO BE DRAWN
+
+  ~
+
+  ~
+
+  ~
+
+  ~
+  
+\end{center}
+\caption{Smalltalk-76 class metaobjects for Rectangle example}
+\label{st76-rectangle-class}
+\end{figure}
+
+
+The catch is that there is no distinction between methods for class
+\textsf{Rectangle}, class \textsf{Turtle}, even class \textsf{Class},
+or any other class in the system: they are all instances of class
+\textsf{Class}, including class \textsf{Class} itself. Because of the
+Smalltalk method execution rule, all these classes share the single
+method dictionary in class \textsf{Class}. This means that the
+\textsf{fromuser} method is defined not just for class
+\textsf{Rectangle}, but also \textsf{Turtle}, \textsf{Integer}, and
+\textsf{Class} itself. Fig.~\ref{st-76-fromuser} shows the result of
+sending \textsf{fromuser} to class \textsf{Turtle} (a message no
+understood error),and Fig.~\ref{st76-rectangle-class} to class
+\textsf{Integer} (an infinite loop that is also caught by the
+Smalltalk system).  Not shown is sending \textsf{fromuser} to class
+\textsf{Class} itself which causes an irretrievable crash of the
+Smalltalk system to which we had access.
+ 
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{pictures/turtle-fromuser.pdf}
+\end{center}
+\caption{Smalltalk-76 \textsf{fromuser} method sent to class
+  \textsf{Turtle} raising an error.}  
+\label{turtle-fromuser}
+\end{figure}
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{pictures/integer-fromuser.pdf}
+\end{center}
+\caption{Smalltalk-76 \textsf{fromuser} method sent to class
+  \textsf{Integer}, triggering an infinite loop that eats stack space.}
+\label{integer-fromuser}
+\end{figure}
+
+In its own terms, this is the largest weakness of the design of
+Smalltalk-76. The kind of bugs in Figs.~\ref{turtle-fromuser}
+and~\ref{integer-fromuser} are obviously one weakness: having methods
+that regularly crash the system, or even that cause manageable errors,
+are clear symptoms of bad design. Presumably those methods could be
+rewritten e.g. to explicitly check that they are not followed by
+instances of the ``wrong'' class --- but such defensive progrmaming is
+very much not in lthe Smalltalk style, nor is it required anyhere else
+in the Smalltalk System. 
+
+The \textsf{fromuser} method then exemplifies another weakness of this
+design: presumably programmers need to extend or to customise the
+creation of new objects. Defining a couple of extras methods on class
+\textsf{Class} to handle some exceptional cases (like
+\textsf{fromuser} is one thing), but requiring several of these
+methods to be defined for every class is rather worse.
+
+Techniques from other langauges, such as additional expicit support
+for constructors, or object initialisation blocks, would be a
+significant diversion from the key design principles, operationalised
+in the ``\verb+=> ->*+'' execution rule: that everything is an object;
+that everything is done by message sends; that every object is an
+instance of a class; and that the class itself defines the behaviour
+and structure of its instances.
+
+
+\subsection{The Metaclass Hierarchy of Smalltalk-80}
+
+Figure~\ref{st-80-metaclasses} sketches the solution that was adopted in
+Smalltalk-80 and is used by classical Smalltalks ever since. In this
+design, a class is represented by a pair of objects: the class object
+itself (e.g. the class object ``\textsf{Rectangle}'') and then its
+correspsonding \textit{metaclass}.
+This is the big change from the
+Smalltalk-76 design (compare Figs.~\ref{st-76-metaphysics}
+and~\ref{st76-rectangle-class}), where every class object was an
+instance of the sole class \textsf{Class}.
+In the Smalltalk-80 design, class objects are
+now (singleton) instances of their metaclass: thus class
+``\textsf{Rectangle}'' will have a metaclass conventionally known as
+``\textsf{Rectangle class}''.
+This name embodies that getting from a
+class to its metaclass is precisely one step along the
+instance-to-class relationship: the same as the first step in the
+Smalltalk message execution rule, and available in the language by
+sending the message ``\textsf{class}'' to the class object itself.
+
+In Figure~\ref{st-80-rectangle-class}, for example, we can see that class
+``\textsf{Rectangle}'' is now the sole instance of the metaclass
+``\textsf{Rectangle class}''; likewise ``\textsf{Turtle}'' is the
+sole instance of the ``\textsf{Turtle class}'' metaclass.
+Inheritance between metaclasses parallels the inheritance between
+classes, and there is still a class ``\textsf{Class}'' (now with its
+corresponding metaclass) that is the class of all classes, and
+likewise the top of the inheritance hierarchy (class \textsf{Object})
+has gained its corresponding metaclass (\textsf{Object class}).  The
+behaviour common to all classes remains in class \textsf{Class};
+likewise class \textsf{Class} continue to inherit from class
+\textsf{Object}.
+
+\begin{figure}[htb]
+\begin{center}
+ 
+  ~
+
+  ~
+
+  ~
+
+  ~   TO BE DRAWN
+
+  ~
+
+  ~
+
+  ~
+
+  ~
+
+  rectangle (class); turtle (class); object (class); class (class).
+  
+\end{center}
+\caption{Smalltalk-80 metaclasses for Rectangle example. Compare with
+  figure~\ref{st76-rectangle-class}}
+\label{st80-rectangle-class}
+\end{figure}
 
 
 
-metaclasses - problem (init / construcors(); 
-solutoin metacalsses;
-running metaclassses on ST76
+We described Figure~\ref{st80-rectangle-class} as a sketch, because
+full Smalltalk-80 systems have an even larger metaclass
+hierarchy. Figure~\ref{st-80-metaclasses} reproduces this hierarchy in
+the notorious Figure 16.5 from \textit{Smalltalk-80: The Language and
+  its Implementation}.  From our perspective, and considering the
+  overall architecture, these figures show essentially the same
+  design: the full system includes a number of intermediate classes
+  (such as ``\textsf{Behaviour}'', ``\textsf{ClassDescription}'', and
+  ``\textsf{Metaclass}'') that serve to factor behaviour out of class
+  ``\textsf{Class}''. The key relationships remain the same. 
+
+
+\begin{figure}[htb]
+\begin{center}
+\includegraphics[width=0.7\textwidth]{pictures/st80-metaclass-hierarchy.pdf}
+\end{center}
+\caption{Figure 16.5 from \textit{Smalltalk-80: The Language and its
+    Implementation}.}
+\label{st-80-metaclasses}
+\end{figure}
+
+
+%% Figure 16.5 has quite likely disincentivised more programmers from
+%% learning Smalltalk than any other single figure: probably only the
+%% syntax, in these days of C's hegemony, has done more to discourage
+%% programmers from learning the language.
 
 
 
+The other key point about this metaclass design (other than the
+question as to whether the cure is worse than the disease) is that it
+does not change the any of the design decisions underlying
+Smalltalk-76: everything is an object; all objects are instances of a
+class; message sending semantcs remain the Smalltalk-76 \verb+=> ->*+
+rule of always going from an instance to its class, and then searching
+up the class hierarchy as necessary. 
+
+
+\subsection{Smalltalk-80 bytecodes}. 
+
+
+Other than this change --- which again is strictly on the Smalltalk
+side, not the interpreter / virtual machine -- -there were few other
+changes\ldots
+
+In that sense, Smalltalk-80 runs on a Smalltalk-76 virtual machine.
+
+But it's not the only one. 
 
 
 
-bytecodes go over in detail
+\begin{figure}[htb]
+\begin{center}
+ 
+  ~
 
+  ~
+
+  ~
+
+  ~   TO BE DRAWN
+
+  ~
+
+  ~  or hopefuly there is a table I can steal
+
+  ~
+
+  ~
+  
+\end{center}
+\caption{Smalltalk-80 Bytecodes}
+\label{st80-bytecodes}
+\end{figure}
 
 
 
